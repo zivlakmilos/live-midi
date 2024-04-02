@@ -1,0 +1,4 @@
+package livemidi
+
+func main() {
+}
