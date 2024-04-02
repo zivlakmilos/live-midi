@@ -10,7 +10,7 @@ run: build
 
 .PHONY: build
 build:
-	@go build -o build/$(EXE) ./cmd/livemidi/main.go
+	@CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o build/$(EXE) ./cmd/livemidi/main.go
 
 .PHONY: test
 test:
