@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"github.com/go-p5/p5"
-	"github.com/zivlakmilos/live-midi/internal/midi"
+	"github.com/zivlakmilos/live-midi/internal/midinote"
 	"github.com/zivlakmilos/live-midi/resources"
 )
 
@@ -72,7 +72,7 @@ func (w *SheetWidget) drawClef(img image.Image, x, y, scale float64) {
 }
 
 func (w *SheetWidget) drawNote(note uint8) {
-	note, octave := midi.Normalize(note)
+	note, octave := midinote.Normalize(note)
 
 	x := w.x + 120
 	y := w.y + 140 - float64(note)*10 - float64(octave)*70
