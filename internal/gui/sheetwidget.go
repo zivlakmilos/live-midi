@@ -3,10 +3,12 @@ package gui
 import (
 	"bytes"
 	"image"
+	"image/color"
 	_ "image/png"
 	"log"
 
 	"github.com/go-p5/p5"
+	"github.com/zivlakmilos/live-midi/internal/midi"
 	"github.com/zivlakmilos/live-midi/resources"
 )
 
@@ -39,9 +41,15 @@ func (w *SheetWidget) Setup() {
 }
 
 func (w *SheetWidget) Draw() {
+	w.drawLines()
+
 	w.drawClef(w.clefG, 0, w.y+45, 0.17)
 	w.drawClef(w.clefF, 10, w.y+165, 0.1)
 
+	w.drawNote(60)
+}
+
+func (w *SheetWidget) drawLines() {
 	for i := 0; i < 5; i++ {
 		x := w.x
 		y := w.y + 40 + 20*float64(i)
@@ -61,4 +69,19 @@ func (w *SheetWidget) drawClef(img image.Image, x, y, scale float64) {
 	p5.Scale(scale, scale)
 	p5.DrawImage(img, 0, 0)
 	p5.Pop()
+}
+
+func (w *SheetWidget) drawNote(note uint8) {
+	note, octave := midi.Normalize(note)
+
+	x := w.x + 120
+	y := w.y + 140 - float64(note)*10 - float64(octave)*70
+	width := 30.0
+	height := 20.0
+	p5.Fill(color.Black)
+	p5.Ellipse(x, y, width, height)
+
+	if note%2 == 0 {
+		p5.Line(x-25, y, x+25, y)
+	}
 }
