@@ -21,14 +21,25 @@ install:
 	@cp ./build/$(EXE) /usr/bin/$(EXE)
 
 .PHONY: dist
-dist: dist-linux
+dist: dist-linux dist-win
 
 .PHONY: dist-linux
 dist-linux: dist-linux-amd64
 
 .PHONY: dist-linux-amd64
 dist-linux-amd64:
-	@rm -f build/$(EXE) && GOARCH=amd64 GOOS=linux go build -o build/$(EXE) ./cmd/eporezi/main.go && tar -czvf "gophoria-${VERSION}-linux-amd64.tar.gz" build/$(EXE)
+	@rm -f build/$(EXE)
+	@GOARCH=amd64 GOOS=linux go build -o build/$(EXE) ./cmd/livemidi/main.go
+	@tar -czvf "$(EXE)-${VERSION}-linux-amd64.tar.gz" build/$(EXE)
+
+.PHONY: dist-win
+dist-win: dist-win-amd64
+
+.PHONY: dist-win-amd64
+dist-win-amd64:
+	@rm -f build/$(EXE).exe
+	@GOARCH=amd64 GOOS=windows go build -ldflags="-H windowsgui" -o build/$(EXE).exe ./cmd/livemidi/main.go
+	@zip "$(EXE)-${VERSION}-win-amd64.zip" build/$(EXE).exe
 
 .PHONY: clean
 clean:
