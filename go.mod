@@ -5,6 +5,7 @@ go 1.22.1
 require (
 	gioui.org v0.0.0-20210729070555-8cec7e04eb71
 	github.com/go-p5/p5 v0.14.0
+	gitlab.com/gomidi/midi/v2 v2.1.7
 )
 
 require (

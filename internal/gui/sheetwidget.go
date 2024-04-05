@@ -6,6 +6,7 @@ import (
 	"image/color"
 	_ "image/png"
 	"log"
+	"slices"
 
 	"github.com/go-p5/p5"
 	"github.com/zivlakmilos/live-midi/internal/midinote"
@@ -17,12 +18,14 @@ type SheetWidget struct {
 	y     float64
 	clefG image.Image
 	clefF image.Image
+	notes []uint8
 }
 
 func NewSheetWidget(x, y float64) *SheetWidget {
 	return &SheetWidget{
-		x: x,
-		y: y,
+		x:     x,
+		y:     y,
+		notes: []uint8{},
 	}
 }
 
@@ -46,7 +49,19 @@ func (w *SheetWidget) Draw() {
 	w.drawClef(w.clefG, 0, w.y+45, 0.17)
 	w.drawClef(w.clefF, 10, w.y+165, 0.1)
 
-	w.drawNote(60)
+	for _, note := range w.notes {
+		w.drawNote(note)
+	}
+}
+
+func (w *SheetWidget) NoteOn(key uint8) {
+	w.notes = append(w.notes, key)
+}
+
+func (w *SheetWidget) NoteOff(key uint8) {
+	w.notes = slices.DeleteFunc(w.notes, func(e uint8) bool {
+		return key == e
+	})
 }
 
 func (w *SheetWidget) drawLines() {

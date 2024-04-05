@@ -9,27 +9,33 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"gitlab.com/gomidi/midi/v2"
 )
 
 type MidiWindow struct {
-	win *app.Window
+	win        *app.Window
+	ports      midi.InPorts
+	group      *widget.Enum
+	btnConnect *widget.Clickable
+	mainWindow *MainWindow
 }
 
-func NewMidiWindow() *MidiWindow {
+func NewMidiWindow(ports midi.InPorts, mainWindow *MainWindow) *MidiWindow {
 	return &MidiWindow{
 		win: app.NewWindow(
 			app.Title("Live MIDI"),
 			app.Size(unit.Dp(300), unit.Dp(300)),
 		),
+		ports:      ports,
+		group:      &widget.Enum{},
+		btnConnect: &widget.Clickable{},
+		mainWindow: mainWindow,
 	}
 }
 
 func (w *MidiWindow) Run() error {
 	th := material.NewTheme(gofont.Collection())
 	var ops op.Ops
-
-	grp := &widget.Enum{}
-	clickable := &widget.Clickable{}
 
 	for {
 		e := <-w.win.Events()
@@ -40,12 +46,12 @@ func (w *MidiWindow) Run() error {
 			gtx := layout.NewContext(&ops, e)
 
 			items := []layout.FlexChild{}
-			items = append(items, layout.Rigid(material.RadioButton(th, grp, "midi1", "MIDI 1").Layout))
-			items = append(items, layout.Rigid(material.RadioButton(th, grp, "midi2", "MIDI 2").Layout))
-			items = append(items, layout.Rigid(material.RadioButton(th, grp, "midi3", "MIDI 3").Layout))
+			for _, port := range w.ports {
+				items = append(items, layout.Rigid(material.RadioButton(th, w.group, port.String(), port.String()).Layout))
+			}
 
 			items = append(items, layout.Rigid(layout.Spacer{Height: unit.Dp(25)}.Layout))
-			items = append(items, layout.Rigid(material.Button(th, clickable, "Save").Layout))
+			items = append(items, layout.Rigid(material.Button(th, w.btnConnect, "Connect").Layout))
 
 			layout.Inset{
 				Top:    unit.Dp(25),
@@ -58,6 +64,10 @@ func (w *MidiWindow) Run() error {
 					Spacing: layout.SpaceEnd,
 				}.Layout(gtx, items...)
 			})
+
+			if w.btnConnect.Clicked() {
+				w.mainWindow.SetupMidi(w.group.Value)
+			}
 
 			e.Frame(gtx.Ops)
 		}
