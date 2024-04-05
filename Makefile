@@ -29,7 +29,7 @@ dist-linux: dist-linux-amd64
 .PHONY: dist-linux-amd64
 dist-linux-amd64:
 	@rm -f build/$(EXE)
-	@GOARCH=amd64 GOOS=linux go build -o build/$(EXE) ./cmd/livemidi/main.go
+	@CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -o build/$(EXE) ./cmd/livemidi/main.go
 	@tar -czvf "$(EXE)-${VERSION}-linux-amd64.tar.gz" build/$(EXE)
 
 .PHONY: dist-win
@@ -38,7 +38,7 @@ dist-win: dist-win-amd64
 .PHONY: dist-win-amd64
 dist-win-amd64:
 	@rm -f build/$(EXE).exe
-	@GOARCH=amd64 GOOS=windows go build -ldflags="-H windowsgui" -o build/$(EXE).exe ./cmd/livemidi/main.go
+	@CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CGO_ENABLED=1 GOARCH=amd64 GOOS=windows go build -ldflags="-H windowsgui" -o build/$(EXE).exe ./cmd/livemidi/main.go
 	@zip "$(EXE)-${VERSION}-win-amd64.zip" build/$(EXE).exe
 
 .PHONY: clean
